@@ -1,0 +1,1888 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+  <title>حامي المدخل — نسخة المتجر الدائم</title>
+  <style>
+    :root{--bg:#061026;--panel:#0f1724;--accent:#ffd166;--danger:#ef476f;--muted:#94a3b8}
+    html,body{height:100%;margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),#021022);color:#fff;overflow:hidden}
+    #game-wrap{max-width:1200px;margin:18px auto;padding:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);display:flex;flex-direction:column;height:calc(100vh - 36px)}
+    header{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;flex-shrink:0}
+    h1{font-size:18px;margin:0}
+    .controls{font-size:13px;color:var(--muted)}
+    #game{display:block;flex-grow:1;background:#081026;border-radius:8px}
+    footer{padding:8px 12px;color:var(--muted);font-size:13px;flex-shrink:0}
+    .btn{background:var(--panel);border:none;color:#fff;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background 0.2s}
+    .btn:hover{background:#1a2536}
+    .small{font-size:13px;padding:6px 8px}
+    .pill{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:999px}
+    #overlay{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:999}
+    .menu{pointer-events:auto;background:linear-gradient(180deg,rgba(2,6,23,0.9),rgba(2,6,23,0.95));padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6);min-width:320px;text-align:center;max-width:90%;max-height:90%;overflow-y:auto}
+    .row{display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:8px}
+    label{font-size:13px}
+    input[type=range]{width:140px}
+    .muted{color:var(--muted)}
+    .upgrade-option{display:block;margin:6px 0;padding:10px;background:#1a2536;border:2px solid transparent;border-radius:8px;cursor:pointer;transition:background 0.2s, border-color 0.2s}
+    .upgrade-option:hover{background:#2a3b50;border-color:var(--accent)}
+    .store-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 8px;
+        background: #1a2536;
+        border-radius: 8px;
+    }
+    .store-item-info {
+        text-align: right;
+        flex-grow: 1;
+        padding-right: 10px;
+    }
+    .store-item-title {
+        font-weight: bold;
+        color: var(--accent);
+    }
+    .buy-btn {
+        background: var(--accent);
+        color: var(--panel);
+        font-weight: bold;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        flex-shrink: 0;
+        margin-right: 5px; /* مسافة بين زر الشراء والبيع */
+    }
+    .buy-btn:disabled {
+        background: var(--muted);
+        cursor: default;
+        opacity: 0.6;
+    }
+    /* زر البيع الجديد */
+    .sell-btn {
+        background: var(--danger);
+        color: #fff;
+        font-weight: bold;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        flex-shrink: 0;
+    }
+    .sell-btn:disabled {
+        background: var(--muted);
+        cursor: default;
+        opacity: 0.6;
+    }
+    @media(max-width:600px){#game-wrap{margin:8px;padding:8px}}
+
+    /* Mobile Joystick Styles - محسّن */
+    .joystick-container {
+      position: fixed;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.15);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .joystick-container.active {
+      pointer-events: auto;
+      background: rgba(255,255,255,0.12);
+    }
+
+    #left-joystick { bottom: 30px; left: 30px; }
+    #right-joystick { bottom: 30px; right: 30px; }
+
+    .joystick-stick {
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      pointer-events: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: transform 0.1s ease-out;
+    }
+
+    /* تحسينات للشاشات الصغيرة */
+    @media (max-width: 768px) {
+      .joystick-container{
+        display:flex;
+        width: 20vw;
+        height: 20vw;
+        min-width: 90px;
+        min-height: 90px;
+        max-width: 120px;
+        max-height: 120px;
+      }
+      
+      .joystick-stick {
+        width: 40%;
+        height: 40%;
+      }
+      
+      #left-joystick { bottom: 25px; left: 25px; }
+      #right-joystick { bottom: 25px; right: 25px; }
+    }
+
+    /* تحسينات للشاشات الكبيرة */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .joystick-container{
+        display:flex;
+        width: 100px;
+        height: 100px;
+      }
+      
+      .joystick-stick {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    /* مؤشرات HUD محسنة */
+    .hud-indicator {
+      position: absolute;
+      font-size: 20px;
+      z-index: 50;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    /* ================================== */
+    /* === التعديلات الجديدة للمظهر === */
+    /* ================================== */
+
+    /* 1. إضافة ظل للنص لجعله يبرز بشكل أفضل */
+    h1, h2, h3, p, .hud-indicator, #score-board, #menu p, #upgrade-menu p {
+        text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8), 0px 0px 10px var(--accent);
+    }
+
+    /* 2. تحسين شكل زر الإيقاف المؤقت (Pause Button) */
+    #pause-btn {
+        border: none;
+        box-shadow: 0 0 10px rgba(255, 209, 102, 0.5); /* ظل حول الزر */
+        transition: all 0.2s; /* لجعل الحركة ناعمة */
+    }
+
+    #pause-btn:hover {
+        box-shadow: 0 0 15px var(--accent); /* زيادة الظل عند التمرير */
+        transform: scale(1.05); /* تكبير خفيف */
+    }
+  </style>
+</head>
+<body>
+  <div id="game-wrap">
+    <header>
+      <div class="controls">
+        &nbsp;&nbsp;<button id="settingsBtn" class="btn small">⏸️</button>
+        &nbsp;<button id="restart" class="btn small">🔄</button><h></h>
+        💰: <strong id="permanent-score">0</strong>
+        &nbsp;|&nbsp;
+        🔝: <strong id="score">0</strong>
+ </div>
+    </header>
+
+    <canvas id="game"></canvas>
+
+    <div id="health-bar" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:none;">
+      <div style="background:rgba(255,0,0,0.3); width:200px; height:8px; border-radius:4px;">
+        <div id="health-fill" style="background:#00ff00; height:100%; width:100%; border-radius:4px; transition:width 0.3s;"></div>
+      </div>
+    </div>
+
+  </div>
+  
+  <div id="overlay" aria-hidden="true" style="display:none">
+    <div class="menu" role="dialog" aria-label="قائمة اللعبة">
+      
+      <div id="main-menu" style="display:none">
+        <h3>♾️لعبة البقاء♾️</h3>
+        <div <button id="start-game-btn" class="btn"><h2>ابدأ اللعبة</h2></button></div>
+        <button id="store-menu-btn" class="btn small" style="margin-top:10px">متجر الترقيات الدائمة 💎</button>
+        <button id="scores-menu-btn" class="btn small" style="margin-top:10px">أفضل 10 نتائج</button>
+        <button id="settings-menu-btn" class="btn small">الإعدادات</button>
+      </div>
+
+      <div id="settings-menu" style="display:none">
+        <h3>إعدادات اللعبة</h3>
+        <div class="row"><label>مستوى الصعوبة:</label>
+          <select id="difficulty"><option value="easy">سهل</option><option value="normal" selected>عادي</option><option value="hard">صعب</option></select>
+        </div>
+        <div class="row"><label>الصوت:</label><input type="checkbox" id="soundToggle" checked><span class="muted">(تأثيرات)</span></div>
+        <div class="row"><label>موسيقى خلفية:</label><input type="checkbox" id="musicToggle" checked><span class="muted">(مولد صوتي)</span></div>
+        <div class="row"><label>حساسية الهدف:</label><input id="sensitivity" type="range" min="0.5" max="2" step="0.1" value="1"></div>&nbsp;&nbsp;
+        أفضل نتيجة: <strong id="highscore">0</strong>
+        &nbsp;&nbsp;
+        <div       <button id="header-store-btn" class="btn small" style="margin-top:0px">🛒</button></div> <div style="margin-top:10px;text-align:right"><button id="close-settings-btn" class="btn small">حفظ وإغلاق</button></div>
+      </div>
+
+      <div id="scores-menu" style="display:none">
+        <h3>أفضل النتائج</h3>
+        <ul id="score-list" style="list-style:none;padding:0;text-align:right;font-size:14px"></ul>
+        <div style="margin-top:10px;text-align:right"><button id="close-scores-btn" class="btn small">إغلاق</button></div>
+      </div>
+      
+      <div id="store-menu" style="display:none">
+        <h3>متجر الترقيات الدائمة 💎</h3>
+        <div style="margin-top:10px;text-align:right"><button id="close-store-btn" class="btn small">إغلاق</button></div>
+        <p>نقاطك الدائمة الحالية: <strong id="current-permanent-score-store">0</strong></p> 
+        <div id="store-items-list">
+            </div>
+      </div>
+      
+      <div id="upgrade-menu" style="display:none">
+        <h3>اكتمل المستوى!</h3>
+        <p>اختر ترقية مؤقتة لهذا الجولة:</p>
+        <button id="upgrade-fire-rate" class="upgrade-option">معدل إطلاق أسرع</button>
+        <button id="upgrade-speed" class="upgrade-option">سرعة حركة أكبر</button>
+        <button id="upgrade-bullet-power" class="upgrade-option">قوة رصاص إضافية</button>
+        </div>
+    </div>
+  </div>
+
+  <div id="left-joystick" class="joystick-container">
+    <div class="joystick-stick"></div>
+  </div>
+  <div id="right-joystick" class="joystick-container">
+    <div class="joystick-stick"></div>
+  </div>
+
+  <div id="hud-indicators" style="position:fixed; top:10px; right:10px; z-index:50; display:none;">
+    <div id="rapid-indicator" class="hud-indicator" style="display:none;">🚀</div>
+    &nbsp;<div id="shield-indicator" class="hud-indicator" style="display:none;">🛡️</div>
+    &nbsp;<div id="magnet-indicator" class="hud-indicator" style="display:none;">🧲</div>
+    &nbsp;<div id="slowdown-indicator" class="hud-indicator" style="display:none;">🐌</div>
+    <div id="speed-indicator" class="hud-indicator" style="display:none; transform:translateY(25px);"></div> 
+  </div>
+
+
+  <script>
+
+// === لعبة محسنة مع متجر دائم ومستويات مستمرة ===
+(() => {
+    // === إعدادات ومتغيرات اللعبة الأساسية ===
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    
+    // تحسين نظام ضبط الحجم
+    const PADDING = 120;//حجم العالم
+    let W, H;
+    let animationFrameId = null;
+    
+    function fitCanvas() {
+        const wrap = document.getElementById('game-wrap');
+        const header = document.querySelector('header');
+        
+        const maxW = Math.min(window.innerWidth - 40, 1200);
+        const maxH = Math.min(window.innerHeight - (header?.offsetHeight || 60) - 40, 800);
+        
+        canvas.width = maxW;
+        canvas.height = maxH;
+        
+        W = canvas.width;
+        H = canvas.height;
+        
+        // تحديث حجم دوائر التحكم
+        updateJoystickSize();
+    }
+
+    function updateJoystickSize() {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            const baseSize = Math.min(window.innerWidth, window.innerHeight) * 0.18//حجم دوائر التحكم;
+            const stickSize = baseSize * 0.4//حجم ازرار دوائر التحكم;
+            
+            document.querySelectorAll('.joystick-container').forEach(joy => {
+                joy.style.width = Math.min(baseSize, 120) + 'px';
+                joy.style.height = Math.min(baseSize, 120) + 'px';
+            });
+            
+            document.querySelectorAll('.joystick-stick').forEach(stick => {
+                stick.style.width = Math.min(stickSize, 50) + 'px';
+                stick.style.height = Math.min(stickSize, 50) + 'px';
+            });
+        }
+    }
+
+    window.addEventListener('resize', fitCanvas);
+    fitCanvas();
+
+    // حالة اللعبة
+    let keys = {}, mouse = { x: 0, y: 0, down: false }, score = 0, permanentScore = 0, running = false, gameOver = false, inMenu = true;
+    const camera = { x: 0, y: 0 };
+
+    // تحسين دوائر التحكم
+    let leftJoystick = { active: false, startX: 0, startY: 0, dx: 0, dy: 0, touchId: null, maxDist: 40 };
+    let rightJoystick = { active: false, startX: 0, startY: 0, dx: 0, dy: 0, touchId: null, maxDist: 40 };
+    
+    // إعدادات قابلة للتعديل
+    const state = { difficulty: 'normal', sound: true, music: true, sensitivity: 1 };
+    
+    // عناصر DOM
+    const scoreEl = document.getElementById('score');
+    const permanentScoreEl = document.getElementById('permanent-score'); // النتيجة الدائمة الجديدة
+    const hsEl = document.getElementById('highscore');
+    const restartBtn = document.getElementById('restart');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const overlay = document.getElementById('overlay');
+    const healthBar = document.getElementById('health-bar');
+    const healthFill = document.getElementById('health-fill');
+    const hudIndicators = document.getElementById('hud-indicators');
+    
+    // القوائم
+    const mainMenu = document.getElementById('main-menu');
+    const settingsMenu = document.getElementById('settings-menu');
+    const scoresMenu = document.getElementById('scores-menu');
+    const upgradeMenu = document.getElementById('upgrade-menu');
+    const storeMenu = document.getElementById('store-menu'); 
+    
+    // الأزرار
+    const startGameBtn = document.getElementById('start-game-btn');
+    const settingsMenuBtn = document.getElementById('settings-menu-btn');
+    const scoresMenuBtn = document.getElementById('scores-menu-btn');
+    const closeSettingsBtn = document.getElementById('close-settings-btn');
+    const closeScoresBtn = document.getElementById('close-scores-btn');
+    const storeMenuBtn = document.getElementById('store-menu-btn');
+    const closeStoreBtn = document.getElementById('close-store-btn');
+    const headerStoreBtn = document.getElementById('header-store-btn'); 
+
+    const upgradeFireRateBtn = document.getElementById('upgrade-fire-rate');
+    const upgradeSpeedBtn = document.getElementById('upgrade-speed');
+    const upgradeBulletPowerBtn = document.getElementById('upgrade-bullet-power');
+    // تم حذف زر الإطلاق المزدوج المؤقت
+    
+    // عناصر دوائر التحكم
+    const leftJoystickEl = document.getElementById('left-joystick');
+    const rightJoystickEl = document.getElementById('right-joystick');
+    const leftJoystickStickEl = leftJoystickEl.querySelector('.joystick-stick');
+    const rightJoystickStickEl = rightJoystickEl.querySelector('.joystick-stick');
+
+    // === نظام الصوت المحسّن ===
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    
+    function ensureAudio() {
+        if (!audioCtx) {
+            audioCtx = new AudioCtx();
+            // إضافة معالج للتعامل مع إيقاف الصوت تلقائياً
+            document.addEventListener('click', () => {
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume().catch(() => {});
+                }
+            }, { once: true });
+        }
+        return audioCtx;
+    }
+
+    // نظام صوتي أكثر استقراراً
+    function safePlayBeep(freq, duration, type = 'sine', gain = 0.12) {
+        if (!state.sound) return;
+        
+        try {
+            const ctx = ensureAudio();
+            if (ctx.state === 'suspended') {
+                ctx.resume().then(() => {
+                    playBeep(freq, duration, type, gain);
+                }).catch(() => {});
+                return;
+            }
+            
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = type;
+            o.frequency.value = freq;
+            g.gain.value = gain;
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.start();
+            o.stop(ctx.currentTime + duration);
+            
+            // تنظيف الذاكرة
+            setTimeout(() => {
+                try {
+                    o.disconnect();
+                    g.disconnect();
+                } catch (e) {}
+            }, duration * 1000 + 100);
+            
+        } catch (error) {
+            console.log('خطأ في الصوت:', error);
+        }
+    }
+
+    // موسيقى خلفية محسنة
+    let bgGain = null, bgOsc = null, bgInterval = null;
+    
+    function startMusic() {
+        if (!state.music) return;
+        stopMusic();
+        
+        try {
+            const ctx = ensureAudio();
+            if (ctx.state === 'suspended') return;
+            
+            bgOsc = ctx.createOscillator();
+            bgGain = ctx.createGain();
+            
+            bgOsc.type = 'sine';
+            bgOsc.frequency.value = 110;
+            bgGain.gain.value = 0.02;
+            
+            bgOsc.connect(bgGain);
+            bgGain.connect(ctx.destination);
+            bgOsc.start();
+            
+            // تغيير النغمة بشكل دوري لمنع الملل
+            bgInterval = setInterval(() => {
+                if (bgOsc) {
+                    bgOsc.frequency.linearRampToValueAtTime(110 + Math.random() * 40 - 20, ctx.currentTime + 2);
+                }
+            }, 3000);
+            
+        } catch (error) {
+            console.log('خطأ في الموسيقى:', error);
+        }
+    }
+
+    function stopMusic() {
+        if (bgInterval) {
+            clearInterval(bgInterval);
+            bgInterval = null;
+        }
+        if (bgOsc) {
+            try { bgOsc.stop(); } catch (e) {}
+            try { bgOsc.disconnect(); } catch (e) {}
+            bgOsc = null;
+        }
+        if (bgGain) {
+            try { bgGain.disconnect(); } catch (e) {}
+            bgGain = null;
+        }
+    }
+    
+    // === نظام إدارة النقاط الدائمة (العملة) ===
+    function loadPermanentScore() {
+        try {
+            const savedScore = localStorage.getItem('hami_permanent_score');
+            return savedScore ? parseInt(savedScore) : 0;
+        } catch (e) {
+            console.error("خطأ في تحميل النقاط الدائمة:", e);
+            return 0;
+        }
+    }
+
+    function savePermanentScore() {
+        try {
+            localStorage.setItem('hami_permanent_score', permanentScore);
+            permanentScoreEl.textContent = permanentScore;
+        } catch (e) {
+            console.error("خطأ في حفظ النقاط الدائمة:", e);
+        }
+    }
+
+    // تهيئة النقاط الدائمة عند بدء اللعبة
+    permanentScore = loadPermanentScore();
+    permanentScoreEl.textContent = permanentScore;
+
+    // دالة لإضافة نقاط الجولة إلى النقاط الدائمة عند نهاية الجولة
+    function addScoreToPermanent(v) {
+        permanentScore += v;
+        savePermanentScore();
+    }
+
+
+    // === نظام المتجر الدائم (جديد) ===
+    class PermanentStore {
+        constructor() {
+            this.MAX_LEVELS = {
+                fireRate: 5, 
+                speed: 5,     
+                power: 5,     
+                maxHp: 3,     
+                doubleShot: 3  // تم تغيير الحد الأقصى للإطلاق المزدوج
+            };
+            this.BASE_PRICES = {
+                fireRate: 100000, // زيادة السعر
+                speed: 80000,     // زيادة السعر
+                power: 120000,    // زيادة السعر
+                maxHp: 200000,    // زيادة السعر
+                doubleShot: 1500000 // زيادة السعر
+            };
+            this.upgrades = this.loadUpgrades();
+        }
+
+        loadUpgrades() {
+            try {
+                const data = localStorage.getItem('hami_permanent_upgrades');
+                const loaded = data ? JSON.parse(data) : {};
+                
+                // التأكد من تهيئة كل ترقية بالحد الأدنى
+                const defaults = { fireRate: 0, speed: 0, power: 0, maxHp: 0, doubleShot: 0 };
+                return { ...defaults, ...loaded };
+            } catch (e) {
+                console.error("خطأ في تحميل ترقيات المتجر:", e);
+                return { fireRate: 0, speed: 0, power: 0, maxHp: 0, doubleShot: 0 };
+            }
+        }
+
+        saveUpgrades() {
+            try {
+                localStorage.setItem('hami_permanent_upgrades', JSON.stringify(this.upgrades));
+            } catch (e) {
+                console.error("خطأ في حفظ ترقيات المتجر:", e);
+            }
+        }
+        
+        getCost(upgradeKey, level = this.upgrades[upgradeKey]) {
+            const basePrice = this.BASE_PRICES[upgradeKey];
+            
+            // زيادة في السعر (تصبح الترقية أصعب)
+            return Math.round(basePrice * Math.pow(2.5, level)); // زيادة نسبة الصعوبة من 1.5 إلى 1.8
+        }
+        
+        getSellPrice(upgradeKey) {
+            const currentLevel = this.upgrades[upgradeKey];
+            if (currentLevel === 0) return 0;
+            
+            // سعر الشراء للمستوى الذي تم بيعه (أي المستوى الحالي - 1)
+            const purchaseCostOfThisLevel = this.getCost(upgradeKey, currentLevel - 1); 
+            
+            // قيمة البيع هي نصف ثمن الشراء (كما طلبت)
+            return Math.floor(purchaseCostOfThisLevel / 2);
+        }
+
+
+        canBuy(upgradeKey, currentScore) {
+            const cost = this.getCost(upgradeKey);
+            const maxLevel = this.MAX_LEVELS[upgradeKey];
+            
+            return currentScore >= cost && this.upgrades[upgradeKey] < maxLevel;
+        }
+
+        buyUpgrade(upgradeKey) {
+            const cost = this.getCost(upgradeKey);
+            if (this.canBuy(upgradeKey, permanentScore)) {
+                permanentScore -= cost; // استخدام النقاط الدائمة
+                this.upgrades[upgradeKey] = Math.min(this.upgrades[upgradeKey] + 1, this.MAX_LEVELS[upgradeKey]);
+                this.saveUpgrades();
+                savePermanentScore(); // حفظ العملة
+                return true;
+            }
+            return false;
+        }
+        
+        // **وظيفة بيع الترقية الجديدة**
+        sellUpgrade(upgradeKey) {
+            const currentLevel = this.upgrades[upgradeKey];
+            if (currentLevel > 0) {
+                const refund = this.getSellPrice(upgradeKey);
+                permanentScore += refund;
+                this.upgrades[upgradeKey] = currentLevel - 1;
+                this.saveUpgrades();
+                savePermanentScore();
+                return true;
+            }
+            return false;
+        }
+
+        applyToPlayer(player) {
+            const u = this.upgrades;
+            
+            // 1. إعادة تعيين القيم الأولية (الثابتة) قبل تطبيق الترقيات الدائمة
+            player.initialSpeed = 220;
+            player.initialReload = 0.12;
+            player.initialBulletPower = 1;
+            player.maxHp = 3;
+            
+            // 2. تطبيق الزيادات الدائمة على القيم الأولية الجديدة:
+            // معدل إطلاق النار: * 0.8 لكل مستوى
+            player.initialReload *= Math.pow(0.8, u.fireRate); 
+            
+            // سرعة الحركة: * 1.1 لكل مستوى
+            player.initialSpeed *= Math.pow(1.1, u.speed); 
+            
+            // قوة الرصاص: +2 قوة رصاص لكل مستوى
+            player.initialBulletPower += (u.power * 2); 
+            
+            // الحد الأقصى للحياة: +1 حياة لكل مستوى
+            player.maxHp += u.maxHp; 
+            
+            // 3. تطبيق قيمة الإطلاق المزدوج
+            // تزيد عدد الرصاصات التي يتم إطلاقها (1 + مستوى الترقية)
+            player.doubleShotPermanentLevel = u.doubleShot; 
+            // الإطلاق المزدوج يبدأ من المستوى 1 (بمعنى إطلاق رصاصتين)
+            // إذا كان المستوى 1: يطلق رصاصتين (1 إضافية)
+            // إذا كان المستوى 2: يطلق 3 رصاصات (2 إضافية)
+        }
+    }
+    
+    const permanentStore = new PermanentStore();
+
+
+    // === كائنات اللعبة مع تحسينات الأداء ===
+    const player = {
+        x: 0, y: 0, r: 16,
+        speed: 220,
+        color: '#ffd166',
+        reload: 0.12,
+        reloadTimer: 0,
+        bulletPower: 1,
+        doubleShot: false, // ترقية مؤقتة (الآن فقط لبعض الترقيات المؤقتة التي قد نضيفها لاحقًا)
+        doubleShotPermanentLevel: 0, // مستوى الترقية الدائمة للإطلاق المزدوج
+        initialSpeed: 220,
+        initialReload: 0.12,
+        initialBulletPower: 1,
+        hp: 3,
+        maxHp: 3,
+        shieldTimer: 0,
+        magnetTimer: 0,
+        upgrades: { fireRate: 0, speed: 0, bulletPower: 0 } // ترقيات مؤقتة للمستوى الحالي
+    };
+
+    // أنظمة تخزين محسنة مع object pooling
+    let bullets = [], enemies = [], particles = [], powerups = [];
+    const particlePool = [];
+    const bulletPool = [];
+    
+    // وظائف مساعدة للذاكرة
+    function createParticle(x, y, color) {
+        if (particlePool.length > 0) {
+            const p = particlePool.pop();
+            Object.assign(p, {
+                x, y, life: rand(0.4, 1.4),
+                vx: rand(-180, 180), vy: rand(-180, 180),
+                r: rand(1, 4), c: color
+            });
+            return p;
+        }
+        return {
+            x, y, life: rand(0.4, 1.4),
+            vx: rand(-180, 180), vy: rand(-180, 180),
+            r: rand(1, 4), c: color
+        };
+    }
+    
+    function recycleParticle(particle) {
+        if (particlePool.length < 1000) {
+            particlePool.push(particle);
+        }
+    }
+
+    // متغيرات اللعبة
+    let spawnTimer = 0, spawnRate = 1.2, elapsed = 0, level = 1, enemiesToSpawn = 0;
+    let boss = null, enemiesDefeatedInLevel = 0;
+    let enemiesPerLevel = 25;
+    let rapidFireTimer = 0, slowdownTimer = 0;
+    // تم إلغاء وضع النجاة Survival Mode لجعله لعب مستمر
+    let survivalMode = false, survivalTimer = 0; 
+
+    // === نظام النتائج المحسّن (نقاط الجولة) ===
+    function loadHighScores() {
+        try {
+            const data = localStorage.getItem('hami_scores');
+            if (!data) return [];
+            
+            const parsed = JSON.parse(data);
+            return Array.isArray(parsed) ? parsed.slice(0, 10) : [];
+        } catch (e) {
+            console.log('خطأ في تحميل النتائج:', e);
+            return [];
+        }
+    }
+
+    function saveHighScores(arr) {
+        try {
+            const toSave = arr.slice(0, 10); // التأكد من عدم تجاوز 10 نتائج
+            localStorage.setItem('hami_scores', JSON.stringify(toSave));
+            localStorage.setItem('hami_scores_backup', JSON.stringify(toSave));
+        } catch (e) {
+            console.log('خطأ في حفظ النتائج:', e);
+        }
+    }
+
+    // تم تعديل دالة pushScore لإضافة النقاط إلى النقاط الدائمة
+    function pushScore(v) {
+        // تحديث النتيجة العالية
+        const arr = loadHighScores();
+        arr.push({ 
+            score: v, 
+            date: new Date().toISOString(),
+            level: level,
+            difficulty: state.difficulty
+        });
+        
+        arr.sort((a, b) => b.score - a.score);
+        saveHighScores(arr);
+        updateHSDisplay();
+        
+        // **الخطوة الأهم: تحويل نقاط الجولة إلى نقاط دائمة**
+        addScoreToPermanent(v);
+    }
+
+    function updateHSDisplay() {
+        const arr = loadHighScores();
+        hsEl.textContent = arr.length ? arr[0].score : '0';
+        permanentScoreEl.textContent = permanentScore; // تحديث عرض النقاط الدائمة
+    }
+    updateHSDisplay();
+
+    // === وظائف مساعدة محسنة ===
+    function rand(min, max) { 
+        return Math.random() * (max - min) + min; 
+    }
+    
+    function dist(a, b) { 
+        const dx = a.x - b.x, dy = a.y - b.y; 
+        return Math.sqrt(dx * dx + dy * dy); 
+    }
+    
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+// ===================================
+// === فئة العدو (Enemy Class) ===
+// ===================================
+class Enemy {
+    constructor(x, y, type, level) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.r = 14; // الحجم الأساسي
+        this.score = 100; // النقاط الأساسية
+        
+        const difficulty = calculateDifficulty();
+        // زيادة مستوى الصعوبة ببطء أكثر في المستويات المتقدمة
+        const levelFactor = 1 + (level - 1) * 0.10; 
+
+        // خصائص إضافية للعدو الفوضوي
+        if (type === 'chaotic') {
+            this.angle = rand(0, Math.PI * 2); // زاوية حركة عشوائية
+            this.moveTimer = 0; // مؤقت لتغيير الاتجاه
+        }
+
+        // تحديد الخصائص حسب نوع العدو
+        switch (type) {
+            case 'normal':
+                this.speed = 110 * difficulty.enemySpeed * levelFactor;
+                this.color = '#ef476f'; 
+                this.hp = Math.round(1 * difficulty.enemyHealth * levelFactor);
+                this.score =100* levelFactor;
+                break;
+            case 'fast':
+                this.speed = 220 * difficulty.enemySpeed * levelFactor;
+                this.color = '#00e0ff'; 
+                this.hp = Math.round(1 * difficulty.enemyHealth * levelFactor);
+                this.score = 200* levelFactor;
+                break;
+            case 'tank':
+                this.speed = 80 * difficulty.enemySpeed * levelFactor;
+                this.color = '#7851a9';
+                this.r = 17; // حجم أكبر قليلاً للدبابة
+                this.hp = Math.round(4 * difficulty.enemyHealth * levelFactor);
+                this.score = 300* levelFactor;
+                break;
+            case 'shooter':
+                this.speed = 90  * difficulty.enemySpeed * levelFactor;
+                this.color = '#ff6f91';
+                this.hp = Math.round(2 * difficulty.enemyHealth * levelFactor);
+                this.shootTimer = rand(1, 2); 
+                this.shootReload = 2;
+                this.score = 250* levelFactor;
+                break;
+            case 'kamikaze':
+                this.speed = 180 * difficulty.enemySpeed * levelFactor;
+                this.color = '#ff0000';
+                this.r = 14;
+                this.hp = Math.round(1 * difficulty.enemyHealth * levelFactor);
+                this.score = 200* levelFactor;
+                break;
+            case 'chaotic': // العدو الفوضوي الجديد
+                this.speed = rand(1.5, 2.5) * 100 * difficulty.enemySpeed * levelFactor; // أسرع من الأعداء العاديين
+                this.color = '#ff00ff'; 
+                this.r = 14;
+                this.hp = Math.round(2 * difficulty.enemyHealth * levelFactor);
+                this.score = 400 * levelFactor;
+                this.shootTimer = rand(2, 4); // مؤقت إطلاق نار بطيء
+                this.shootReload = rand(3, 5);
+                break;
+            default:
+                this.speed = 100; this.color = '#fff'; this.hp = 1;
+        }
+        this.maxHp = this.hp;
+        this.score = Math.round(this.score); // تقريب النقاط
+    }
+
+    // وظيفة لتحديث موقع العدو وحركته
+    update(dt) {
+        const dx = player.x - this.x;
+        const dy = player.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const speedFactor = slowdownTimer > 0 ? 0.5 : 1;
+        
+        // منطق الحركة لجميع الأعداء ما عدا 'chaotic'
+        if (this.type !== 'chaotic' && dist > 0) {
+            const angle = Math.atan2(dy, dx);
+            
+            // Shooter يبقى على مسافة قصيرة
+            if (this.type === 'shooter' && dist < 200) {
+                this.x += Math.cos(angle) * this.speed * dt * speedFactor * 0.1;
+                this.y += Math.sin(angle) * this.speed * dt * speedFactor * 0.1;
+            } else {
+                this.x += Math.cos(angle) * this.speed * dt * speedFactor;
+                this.y += Math.sin(angle) * this.speed * dt * speedFactor;
+            }
+        } else if (this.type === 'chaotic') {
+            // منطق الحركة العشوائية للعدو الفوضوي
+            this.moveTimer -= dt;
+            if (this.moveTimer <= 0) {
+                // تغيير الاتجاه كل 0.5 إلى 1.5 ثانية
+                this.angle = rand(0, Math.PI * 2);
+                this.moveTimer = rand(0.5, 1.5); 
+            }
+            
+            // تطبيق الحركة بناءً على الزاوية العشوائية
+            this.x += Math.cos(this.angle) * this.speed * dt * speedFactor;
+            this.y += Math.sin(this.angle) * this.speed * dt * speedFactor;
+            
+            // إبقاء العدو الفوضوي ضمن حدود اللعب
+            this.x = clamp(this.x, -PADDING + this.r, W + PADDING - this.r);
+            this.y = clamp(this.y, -PADDING + this.r, H + PADDING - this.r);
+        }
+
+        // منطق إطلاق النار
+        if ((this.type === 'shooter' || this.type === 'chaotic')) {
+            this.shootTimer -= dt;
+            if (this.shootTimer <= 0) {
+                if (this.type === 'shooter') {
+                    enemyShoot(this.x, this.y, player.x, player.y);
+                    this.shootTimer = this.shootReload; 
+                } else if (this.type === 'chaotic') {
+                    // إطلاق نار عشوائي بـ 4 رصاصات للـ Chaotic
+                    for (let i = 0; i < 3; i++) {
+                        const randomAngle = rand(0, Math.PI * 2); 
+                        // نمرر الزاوية العشوائية بدلاً من إحداثيات اللاعب
+                        enemyShoot(this.x, this.y, null, null, randomAngle); 
+                    }
+                    this.shootTimer = this.shootReload; 
+                }
+            }
+        }
+    }
+}
+// ===================================
+
+    // === نظام الاصطدام المحسّن ===
+    function checkCollisions() {
+        // الاصطدام بين الرصاص والأعداء (أكثر كفاءة)
+        for (let j = bullets.length - 1; j >= 0; j--) {
+            const bullet = bullets[j];
+            
+            if (bullet.fromEnemy) {
+                // رصاص الأعداء مع اللاعب
+                if (dist(bullet, player) < bullet.r + player.r) {
+                    bullets.splice(j, 1);
+                    if (player.shieldTimer <= 0) {
+                        player.hp = clamp(player.hp - 1, 0, player.maxHp);
+                        spawnParticles(player.x, player.y, '#ef476f', 28);
+                        safePlayBeep(80, 0.6, 'sine', 0.08);
+                        
+                        if (player.hp <= 0) {
+                            gameOver = true;
+                            running = false;
+                        }
+                    } else {
+                        safePlayBeep(120, 0.2, 'sine', 0.08);
+                    }
+                    continue;
+                }
+            } else {
+                // رصاص اللاعب مع الأعداء
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    const enemy = enemies[i];
+                    if (dist(bullet, enemy) < bullet.r + enemy.r) {
+                        bullets.splice(j, 1);
+                        enemy.hp -= bullet.power;
+                        spawnParticles(bullet.x, bullet.y, '#ffd166', 10);
+                        safePlayBeep(400 + rand(0, 120), 0.06, 'sawtooth', 0.05);
+                        
+                        if (enemy.hp <= 0) {
+                            if (Math.random() < 0.20) spawnPowerup(enemy.x, enemy.y);
+                            
+                            enemies.splice(i, 1);
+                            score += enemy.score;
+                            scoreEl.textContent = score;
+                            enemiesDefeatedInLevel++;
+                            spawnParticles(enemy.x, enemy.y, '#94f', 20);
+                            safePlayBeep(1200, 0.08, 'triangle', 0.08);
+                            
+                            if (score > parseInt(hsEl.textContent || '0')) {
+                                // لا ندفع النتيجة هنا، فقط في شاشة نهاية اللعبة
+                                // pushScore(score); 
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // الاصطدام بين الأعداء واللاعب
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const enemy = enemies[i];
+            if (dist(enemy, player) < enemy.r + player.r) {
+                if (player.shieldTimer <= 0) {
+                    player.hp = clamp(player.hp - 1, 0, player.maxHp);
+                    spawnParticles(player.x, player.y, '#ef476f', 28);
+                    safePlayBeep(80, 0.6, 'sine', 0.08);
+                    
+                    if (player.hp <= 0) {
+                        gameOver = true;
+                        running = false;
+                    }
+                } else {
+                    safePlayBeep(120, 0.2, 'sine', 0.08);
+                }
+                
+                spawnParticles(enemy.x, enemy.y, enemy.color, 30);
+                enemies.splice(i, 1);
+            }
+        }
+        
+        // الاصطدام مع powerups
+        for (let i = powerups.length - 1; i >= 0; i--) {
+            const p = powerups[i];
+            if (dist(p, player) < p.r + player.r) {
+                applyPowerup(p.type);
+                safePlayBeep(1500, 0.1, 'sine', 0.1);
+                powerups.splice(i, 1);
+            }
+        }
+    }
+
+function applyPowerup(type) {
+    switch(type) {
+        case 'points': score += 1000; break//المكافأة;
+        case 'rapid': rapidFireTimer = 6; break//سرعه الاطلاق;
+        case 'magnet': player.magnetTimer = 6; break//مغناطيس;
+        case 'shield': player.shieldTimer = 4; break//درع;
+        case 'health': player.hp = clamp(player.hp + 1, 0, player.maxHp); break;
+        case 'slowdown': slowdownTimer = 5; break//إبطاء;
+        
+        // منطق قنبلة الانفجار
+        case 'nova': 
+            enemies.forEach(e => {
+                spawnParticles(e.x, e.y, e.color, 25);
+                score += e.score; 
+            });
+            enemies = []; 
+            safePlayBeep(2000, 0.2, 'sawtooth', 0.2); 
+            break;
+    }
+    updateHUDIndicators();
+}
+
+
+    // === نظام إدارة القوائم ===
+    function showMenu(menuId) {
+        overlay.style.display = 'flex';
+        mainMenu.style.display = 'none';
+        settingsMenu.style.display = 'none';
+        scoresMenu.style.display = 'none';
+        upgradeMenu.style.display = 'none';
+        storeMenu.style.display = 'none'; 
+        
+        const menu = document.getElementById(menuId);
+        if (menu) menu.style.display = 'block';
+    }
+
+    // ** وظيفة إيقاف مؤقت للعبة **
+    let wasRunningBeforeSettings = false; // حالة جديدة لتتبع حالة اللعب قبل فتح الإعدادات
+
+    function togglePause() {
+        running = !running;
+        if (running) {
+            last = performance.now();
+            animationFrameId = requestAnimationFrame(loop);
+        } else {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+        }
+    }
+
+    // === معالجة أحداث المتجر (جديد) ===
+    function setupStoreMenu() {
+        const list = document.getElementById('store-items-list');
+        list.innerHTML = '';
+        // تحديث عرض النقاط الدائمة
+        document.getElementById('current-permanent-score-store').textContent = permanentScore; 
+
+        const storeItems = [
+            { key: 'fireRate', title: 'معدل إطلاق دائم 🚀', desc: 'زيادة دائمة لسرعة إطلاق النار. (5 مستويات)' },
+            { key: 'speed', title: 'سرعة حركة دائمة 💨', desc: 'زيادة دائمة لسرعة حركة مركبتك. (5 مستويات)' },
+            { key: 'power', title: 'قوة رصاص دائمة 🔥', desc: 'زيادة دائمة لقوة الرصاص. (5 مستويات)' },
+            { key: 'maxHp', title: 'قلب إضافي دائم ❤️', desc: 'زيادة دائمة للحد الأقصى للحياة. (3 مستويات)' },
+            { key: 'doubleShot', title: 'رصاص إضافي دائم 💥', desc: 'إطلاق رصاصة إضافية دائمة. (3 مستويات)' } // تم تغيير الوصف
+        ];
+
+        storeItems.forEach(item => {
+            const level = permanentStore.upgrades[item.key];
+            const max = permanentStore.MAX_LEVELS[item.key];
+            const cost = permanentStore.getCost(item.key);
+            const sellPrice = permanentStore.getSellPrice(item.key);
+            const canBuy = permanentStore.canBuy(item.key, permanentScore);
+            const canSell = level > 0;
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'store-item';
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'store-item-info';
+            infoDiv.innerHTML = `
+                <div class="store-item-title">${item.title}</div>
+                <div class="muted">${item.desc}</div>
+                <div>المستوى: ${level} / ${max}</div>
+            `;
+            
+            // حاوية للأزرار
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.gap = '5px';
+
+            // زر الشراء
+            const buyBtn = document.createElement('button');
+            buyBtn.className = 'buy-btn';
+            
+            if (level >= max) {
+                buyBtn.textContent = 'أقصى مستوى ✅';
+                buyBtn.disabled = true;
+            } else {
+                buyBtn.textContent = `شراء: ${cost} نقطة`;
+                buyBtn.disabled = !canBuy;
+                buyBtn.addEventListener('click', () => {
+                    if (permanentStore.buyUpgrade(item.key)) {
+                        setupStoreMenu(); // إعادة بناء القائمة لتحديث الحالة
+                        safePlayBeep(1800, 0.1, 'square', 0.1); // صوت شراء ناجح
+                    } else {
+                         safePlayBeep(100, 0.1, 'sine', 0.1); // صوت فشل الشراء
+                    }
+                });
+            }
+            
+            // زر البيع
+            const sellBtn = document.createElement('button');
+            sellBtn.className = 'sell-btn';
+            sellBtn.textContent = `بيع: ${sellPrice} نقطة`;
+            sellBtn.disabled = !canSell;
+            sellBtn.addEventListener('click', () => {
+                if (permanentStore.sellUpgrade(item.key)) {
+                    setupStoreMenu(); // إعادة بناء القائمة لتحديث الحالة
+                    safePlayBeep(800, 0.1, 'triangle', 0.1); // صوت بيع
+                }
+            });
+
+            buttonContainer.appendChild(buyBtn);
+            buttonContainer.appendChild(sellBtn);
+            
+            itemDiv.appendChild(infoDiv);
+            itemDiv.appendChild(buttonContainer);
+            list.appendChild(itemDiv);
+        });
+    }
+
+
+    // === معالجة الأحداث المحسنة ===
+    startGameBtn.addEventListener('click', () => {
+        resetGame();
+        overlay.style.display = 'none';
+        inMenu = false;
+        healthBar.style.display = 'block';
+        hudIndicators.style.display = 'block';
+    });
+
+    // ** تعديل معالجة زر الإعدادات في الـ Header (المتطلَب رقم 5) **
+    settingsBtn.addEventListener('click', () => { 
+        if(running) {
+            wasRunningBeforeSettings = true;
+            togglePause(); // إيقاف اللعبة مؤقتاً
+        } else {
+            wasRunningBeforeSettings = false;
+        }
+        showMenu('settings-menu'); 
+    });
+    settingsMenuBtn.addEventListener('click', () => { showMenu('settings-menu'); });
+    
+    closeSettingsBtn.addEventListener('click', () => {
+        overlay.style.display = inMenu ? 'flex' : 'none';
+        if (inMenu) showMenu('main-menu');
+        else if(wasRunningBeforeSettings) togglePause(); // استئناف اللعبة إذا كانت تعمل قبل فتح القائمة
+        else if(running) overlay.style.display = 'none';
+    });
+
+    scoresMenuBtn.addEventListener('click', () => {
+        const scoreList = document.getElementById('score-list');
+        const arr = loadHighScores();
+        scoreList.innerHTML = arr.map((s, i) => 
+            `<li>${i + 1}. <b>${s.score}</b> - ${new Date(s.date).toLocaleDateString('ar-EG')} - المستوى ${s.level}</li>`
+        ).join('');
+        showMenu('scores-menu');
+    });
+
+    closeScoresBtn.addEventListener('click', () => { showMenu('main-menu'); });
+    
+    storeMenuBtn.addEventListener('click', () => { // زر المتجر
+        setupStoreMenu();
+        showMenu('store-menu');
+    });
+    
+    closeStoreBtn.addEventListener('click', () => { showMenu('main-menu'); }); // إغلاق المتجر
+
+    // جعل زر المتجر في "الـ Header" يعمل
+    headerStoreBtn.addEventListener('click', () => {
+        // لا نحتاج لإيقاف اللعبة عند فتح المتجر
+        setupStoreMenu();
+        showMenu('store-menu');
+    });
+
+    // نظام الترقيات المؤقتة (تم حذف الإطلاق المزدوج)
+    upgradeFireRateBtn.addEventListener('click', () => { 
+        player.upgrades.fireRate++; 
+        startNextLevel(); 
+    });
+    upgradeSpeedBtn.addEventListener('click', () => { 
+        player.upgrades.speed++; 
+        startNextLevel(); 
+    });
+    upgradeBulletPowerBtn.addEventListener('click', () => { 
+        player.upgrades.bulletPower++; 
+        startNextLevel(); 
+    });
+
+    function resetPlayerUpgrades() {
+        // إعادة تعيين الترقيات المؤقتة فقط
+        player.upgrades = { fireRate: 0, speed: 0, bulletPower: 0 };
+        // سيتم تطبيق القيم الأساسية والثابتة من المتجر في دالة resetGame
+    }
+
+    // معالجة الإعدادات
+    document.getElementById('difficulty').addEventListener('change', e => { 
+        state.difficulty = e.target.value; 
+        applyDifficulty(); 
+    });
+    
+    document.getElementById('soundToggle').addEventListener('change', e => { 
+        state.sound = e.target.checked; 
+    });
+    
+    document.getElementById('musicToggle').addEventListener('change', e => { 
+        state.music = e.target.checked; 
+        if (state.music && running) startMusic(); 
+        else stopMusic(); 
+    });
+    
+    document.getElementById('sensitivity').addEventListener('input', e => { 
+        state.sensitivity = parseFloat(e.target.value); 
+    });
+    
+    restartBtn.addEventListener('click', () => { resetGame(); });
+
+    // === معالجة الإدخال المحسنة (نظام اللمس والماوس ولوحة المفاتيح) ===
+    
+    window.addEventListener('keydown', e => {
+        const key = e.key.toLowerCase();
+        keys[key] = true;
+        
+        if (key === 'p') togglePause();
+        if (key === 'r' && gameOver) resetGame();
+        if (key === 'escape' && running) togglePause();
+    });
+    
+    window.addEventListener('keyup', e => {
+        keys[e.key.toLowerCase()] = false;
+    });
+
+    // إدارة فقدان التركيز
+    window.addEventListener('blur', () => {
+        if (running && !gameOver) {
+            togglePause();
+        }
+    });
+
+    // === نظام اللمس المحسّن (تم الاحتفاظ بالكود كما هو) ===
+    let touchBounds = { left: null, right: null };
+    
+    function updateTouchBounds() {
+        touchBounds = {
+            left: leftJoystickEl.getBoundingClientRect(),
+            right: rightJoystickEl.getBoundingClientRect()
+        };
+    }
+
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchcancel', handleTouchEnd);
+    
+    // تحديث حدود اللمس عند تغيير الحجم
+    window.addEventListener('resize', updateTouchBounds);
+    updateTouchBounds();
+
+    function handleTouchStart(e) {
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
+        }
+        
+        updateTouchBounds();
+        
+        for (const touch of e.changedTouches) {
+            const { clientX, clientY, identifier } = touch;
+            
+            if (!leftJoystick.active && isInBounds(clientX, clientY, touchBounds.left)) {
+                activateJoystick(leftJoystick, leftJoystickEl, leftJoystickStickEl, clientX, clientY, identifier);
+            } else if (!rightJoystick.active && isInBounds(clientX, clientY, touchBounds.right)) {
+                activateJoystick(rightJoystick, rightJoystickEl, rightJoystickStickEl, clientX, clientY, identifier);
+            }
+        }
+    }
+
+    function isInBounds(x, y, bounds) {
+        return x >= bounds.left && x <= bounds.right && y >= bounds.top && y <= bounds.bottom;
+    }
+
+    function activateJoystick(joystick, element, stick, x, y, id) {
+        joystick.active = true;
+        joystick.startX = x;
+        joystick.startY = y;
+        joystick.touchId = id;
+        joystick.dx = joystick.dy = 0;
+        element.classList.add('active');
+    }
+
+    function handleTouchMove(e) {
+        for (const touch of e.changedTouches) {
+            const { clientX, clientY, identifier } = touch;
+            
+            if (leftJoystick.active && leftJoystick.touchId === identifier) {
+                updateJoystickPosition(leftJoystick, leftJoystickStickEl, clientX, clientY);
+            } else if (rightJoystick.active && rightJoystick.touchId === identifier) {
+                updateJoystickPosition(rightJoystick, rightJoystickStickEl, clientX, clientY);
+            }
+        }
+    }
+
+    function updateJoystickPosition(joystick, stickElement, x, y) {
+        const dx = x - joystick.startX;
+        const dy = y - joystick.startY;
+        const dist = Math.hypot(dx, dy);
+        const maxDist = joystick.maxDist;
+        
+        if (dist > maxDist) {
+            joystick.dx = (dx / dist) * maxDist;
+            joystick.dy = (dy / dist) * maxDist;
+        } else {
+            joystick.dx = dx;
+            joystick.dy = dy;
+        }
+        
+        stickElement.style.transform = `translate(${joystick.dx}px, ${joystick.dy}px)`;
+    }
+
+    function handleTouchEnd(e) {
+        for (const touch of e.changedTouches) {
+            const { identifier } = touch;
+            
+            if (leftJoystick.active && leftJoystick.touchId === identifier) {
+                deactivateJoystick(leftJoystick, leftJoystickEl, leftJoystickStickEl);
+            } else if (rightJoystick.active && rightJoystick.touchId === identifier) {
+                deactivateJoystick(rightJoystick, rightJoystickEl, rightJoystickStickEl);
+            }
+        }
+    }
+
+    function deactivateJoystick(joystick, element, stickElement) {
+        joystick.active = false;
+        joystick.dx = joystick.dy = 0;
+        joystick.touchId = null;
+        stickElement.style.transform = 'translate(0, 0)';
+        element.classList.remove('active');
+    }
+
+    // أحداث الماوس
+    canvas.addEventListener('mousemove', e => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = (e.clientX - rect.left) * (canvas.width / rect.width);
+        mouse.y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    });
+    
+    canvas.addEventListener('mousedown', e => {
+        mouse.down = true;
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
+        }
+    });
+    
+    canvas.addEventListener('mouseup', e => { 
+        mouse.down = false; 
+    });
+
+    // === وظائف اللعبة الأساسية المحسنة ===
+    function shoot(fromX, fromY, tx, ty) {
+        const ang = Math.atan2(ty - fromY, tx - fromX);
+        const bulletSpeed = 520 * state.sensitivity;
+        const newBullet = { 
+            x: fromX, y: fromY, 
+            vx: Math.cos(ang) * bulletSpeed, 
+            vy: Math.sin(ang) * bulletSpeed, 
+            r: 4,//حجم الرصاص
+ life: 1.6, 
+            power: player.bulletPower,
+            fromEnemy: false
+        };
+        
+        // **منطق الإطلاق المزدوج/المتعدد الجديد**
+        // عدد الرصاصات الإضافية هو مستوى الترقية الدائمة
+        const extraBullets = player.doubleShotPermanentLevel; 
+        
+        if (extraBullets > 0) {
+            const offsetStep = 10;
+            const perpAngle = ang + Math.PI / 2;
+            
+            // إطلاق الرصاصة الأساسية
+            bullets.push(newBullet);
+            
+            // إطلاق الرصاصات الإضافية (واحدة على كل جانب)
+            for (let i = 1; i <= extraBullets; i++) {
+                const offset = offsetStep * i;
+                bullets.push({ ...newBullet, x: fromX + Math.cos(perpAngle) * offset, y: fromY + Math.sin(perpAngle) * offset });
+                bullets.push({ ...newBullet, x: fromX - Math.cos(perpAngle) * offset, y: fromY - Math.sin(perpAngle) * offset });
+            }
+            // ملاحظة: مع مستوى ترقية 3، سيكون العدد الإجمالي للرصاصات هو: 1 (الأساسية) + 3 (يميناً) + 3 (يساراً) = 7 رصاصات! وهذا ممتاز لترقية ذات 3 مستويات.
+            
+        } else if (player.upgrades.doubleShot) { // في حال وجود ترقية مؤقتة للإطلاق المزدوج (إذا أعدناها)
+             const offset = 10;
+             const perpAngle = ang + Math.PI / 2;
+             bullets.push({ ...newBullet, x: fromX + Math.cos(perpAngle) * offset, y: fromY + Math.sin(perpAngle) * offset });
+             bullets.push({ ...newBullet, x: fromX - Math.cos(perpAngle) * offset, y: fromY - Math.sin(perpAngle) * offset });
+        } else {
+            bullets.push(newBullet);
+        }
+        
+        safePlayBeep(900 + rand(0, 60), 0.03, 'square', 0.06);
+    }
+
+    function spawnEnemy() {
+        const edge = Math.floor(rand(0, 4));
+        let ex, ey;
+        
+        switch(edge) {
+            case 0: ex = rand(0, W); ey = -PADDING; break;
+            case 1: ex = W + PADDING; ey = rand(0, H); break;
+            case 2: ex = rand(0, W); ey = H + PADDING; break;
+            default: ex = -PADDING; ey = rand(0, H); break;
+        }
+
+        const enemyTypes = ['normal', 'fast', 'tank', 'shooter', 'kamikaze', 'chaotic'];
+        const type = enemyTypes[Math.floor(rand(0, enemyTypes.length))];
+        
+        const enemy = new Enemy(ex, ey, type, level); 
+        enemies.push(enemy);
+    }
+
+
+    function calculateDifficulty() {
+        const base = {
+            easy: { spawnRate: 1.6, enemyHealth: 0.8, enemySpeed: 0.9 },
+            normal: { spawnRate: 1.2, enemyHealth: 1.0, enemySpeed: 1.0 },
+            hard: { spawnRate: 0.8, enemyHealth: 1.3, enemySpeed: 1.2 }
+        }[state.difficulty] || base.normal;
+        
+        return base;
+    }
+
+    function enemyShoot(fromX, fromY, tx, ty, angle = null) { 
+        if (angle === null) {
+            const dx = player.x - fromX;
+            const dy = player.y - fromY;
+            angle = Math.atan2(dy, dx);
+        }
+        
+        const bulletSpeed = 160;
+        bullets.push({ 
+            x: fromX, y: fromY, 
+            vx: Math.cos(angle) * bulletSpeed, 
+            vy: Math.sin(angle) * bulletSpeed, 
+            r: 5,//حجم رصاص العدو
+ life: 4, 
+            fromEnemy: true, 
+            color: '#ff6f91' 
+        });
+        safePlayBeep(300 + rand(0, 40), 0.04, 'sawtooth', 0.05);
+    }
+
+
+    function spawnParticles(x, y, color, count) {
+        for (let i = 0; i < count; i++) {
+            particles.push(createParticle(x, y, color));
+        }
+    }
+
+
+    function spawnPowerup(x, y) {
+        const types = ['points', 'health', 'rapid', 'magnet', 'shield', 'slowdown', 'nova']; 
+        const type = types[Math.floor(rand(0, types.length))];
+        powerups.push({ x, y, r: 12, type, life: 7 });
+    }
+
+    // تم دمج منطق الترقيات المؤقتة والدائمة هنا
+	 function applyUpgrades() {
+        // إعادة تعيين إلى القيم الأساسية *بعد* تطبيق الترقيات الدائمة
+        player.speed = player.initialSpeed;
+        player.reload = player.initialReload;
+        player.bulletPower = player.initialBulletPower;
+        
+        // تطبيق الترقيات المؤقتة
+        player.reload *= Math.pow(0.8, player.upgrades.fireRate);
+        player.speed *= Math.pow(1.1, player.upgrades.speed);
+        player.bulletPower += (player.upgrades.bulletPower * 2); 
+        
+        // (تم تجاهل ترقية الإطلاق المزدوج المؤقتة)
+    }
+
+
+    function showUpgradeMenu() {
+        // في نمط اللعب المستمر، نتيح كل الترقيات المؤقتة في كل مرة
+        [upgradeFireRateBtn, upgradeSpeedBtn, upgradeBulletPowerBtn] // تم حذف الإطلاق المزدوج المؤقت
+            .forEach(btn => btn.style.display = 'block');
+        
+        showMenu('upgrade-menu');
+    }
+
+    function updateHUDIndicators() {
+        // يجب أن نستخدم (player.doubleShotPermanentLevel > 0) إذا أردنا مؤشرًا للإطلاق الدائم
+        // لكننا سنستخدم مؤشرات الترقيات المؤقتة فقط حالياً (عدا السرعة)
+        const indicators = {
+            'rapid-indicator': rapidFireTimer > 0,
+            'shield-indicator': player.shieldTimer > 0,
+            'magnet-indicator': player.magnetTimer > 0,
+            'slowdown-indicator': slowdownTimer > 0,
+            // نعرض مؤشر السرعة إذا كان هناك أي ترقية دائمة أو مؤقتة
+            'speed-indicator': player.upgrades.speed > 0 || permanentStore.upgrades.speed > 0
+        };
+        
+        Object.entries(indicators).forEach(([id, visible]) => {
+            document.getElementById(id).style.display = visible ? 'block' : 'none';
+        });
+        
+        // تحديث شريط الحياة
+        if (healthFill) {
+            const percent = (player.hp / player.maxHp) * 100;
+            healthFill.style.width = percent + '%';
+            healthFill.style.background = percent > 50 ? '#00ff00' : percent > 25 ? '#ffff00' : '#ff0000';
+        }
+    }
+
+    // === الحلقة الرئيسية المحسنة ===
+    let last = performance.now();
+    
+    function loop(ts) {
+        if (!running) {
+            last = ts;
+            animationFrameId = requestAnimationFrame(loop);
+            return;
+        }
+        
+        const dt = Math.min((ts - last) / 1000, 0.1); 
+        last = ts;
+        elapsed += dt;
+
+        // تحديث الكاميرا
+        camera.x = player.x - W / 2;
+        camera.y = player.y - H / 2;
+
+        // تحديث المؤقتات
+        if (rapidFireTimer > 0) rapidFireTimer -= dt;
+        if (player.shieldTimer > 0) player.shieldTimer -= dt;
+        if (player.magnetTimer > 0) player.magnetTimer -= dt;
+        if (slowdownTimer > 0) slowdownTimer -= dt;
+        
+        // حركة اللاعب
+        if (leftJoystick.active && (leftJoystick.dx !== 0 || leftJoystick.dy !== 0)) {
+            const angle = Math.atan2(leftJoystick.dy, leftJoystick.dx);
+            const currentSpeed = player.speed * dt;
+            player.x += Math.cos(angle) * currentSpeed;
+            player.y += Math.sin(angle) * currentSpeed;
+        } else {
+            let vx = 0, vy = 0;
+            if (keys['arrowright'] || keys['d']) vx += 1;
+            if (keys['arrowleft'] || keys['a']) vx -= 1;
+            if (keys['arrowdown'] || keys['s']) vy += 1;
+            if (keys['arrowup'] || keys['w']) vy -= 1;
+        
+            if (vx !== 0 || vy !== 0) {
+                const angle = Math.atan2(vy, vx);
+                const currentSpeed = player.speed * dt;
+                player.x += Math.cos(angle) * currentSpeed;
+                player.y += Math.sin(angle) * currentSpeed;
+            }
+        }
+
+        // حدود العالم
+        const worldW = W + PADDING * 2;
+        const worldH = H + PADDING * 2;
+        player.x = clamp(player.x, -PADDING + player.r, W + PADDING - player.r);
+        player.y = clamp(player.y, -PADDING + player.r, H + PADDING - player.r);
+        
+        // تقدم المستوى - المستويات المستمرة
+        enemiesPerLevel = 25 + (level - 1) * 5;
+            
+        if (enemiesDefeatedInLevel >= enemiesPerLevel) {
+            running = false;
+            showUpgradeMenu(); // ترقية نهاية المستوى المؤقتة
+            return;
+        }
+            
+        // إطلاق النار
+        player.reloadTimer -= dt;
+        const currentReload = rapidFireTimer > 0 ? player.reload / 2 : player.reload;
+        
+        if (rightJoystick.active && player.reloadTimer <= 0 && (rightJoystick.dx !== 0 || rightJoystick.dy !== 0)) {
+            const ang = Math.atan2(rightJoystick.dy, rightJoystick.dx);
+            const tx = player.x + Math.cos(ang) * 100;
+            const ty = player.y + Math.sin(ang) * 100;
+            shoot(player.x, player.y, tx, ty);
+            player.reloadTimer = currentReload;
+        } else if (mouse.down && player.reloadTimer <= 0) {
+            shoot(player.x, player.y, mouse.x + camera.x, mouse.y + camera.y);
+            player.reloadTimer = currentReload;
+        }
+
+        // تحديث الرصاص
+        bullets = bullets.filter(b => {
+            b.x += b.vx * dt;
+            b.y += b.vy * dt;
+            b.life -= dt;
+            return b.life > 0 && 
+                   b.x > -PADDING * 2 && b.x < W + PADDING * 2 && 
+                   b.y > -PADDING * 2 && b.y < H + PADDING * 2;
+        });
+
+        // توليد الأعداء
+        spawnTimer -= dt;
+        if (spawnTimer <= 0 && (enemies.length + enemiesDefeatedInLevel < enemiesPerLevel)) {
+            const count = Math.min(3 + Math.floor(level / 2), 12); 
+            for (let i = 0; i < count; i++) spawnEnemy();
+            spawnRate = calculateDifficulty().spawnRate * Math.pow(0.95, level); // زيادة صعوبة SpawnRate
+            spawnTimer = spawnRate;
+        }
+
+        // تحديث الأعداء
+        enemies.forEach(enemy => {
+            enemy.update(dt); 
+        });
+
+        // إزالة الأعداء خارج الحدود
+        enemies = enemies.filter(enemy => 
+            enemy.x >= -PADDING * 2 && enemy.x <= W + PADDING * 2 && 
+            enemy.y >= -PADDING * 2 && enemy.y <= H + PADDING * 2
+        );
+
+        // التحقق من الاصطدامات
+        checkCollisions();
+
+        // تحديث powerups مع المغناطيس
+        powerups.forEach(p => {
+            if (player.magnetTimer > 0 && dist(p, player) < 200) {
+                const angle = Math.atan2(player.y - p.y, player.x - p.x);
+                p.x += Math.cos(angle) * 300 * dt;
+                p.y += Math.sin(angle) * 300 * dt;
+            }
+            p.life -= dt;
+        });
+        
+        powerups = powerups.filter(p => p.life > 0);
+            
+        // تحديث الجسيمات
+        particles.forEach(p => {
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.vx *= 0.98;
+            p.vy *= 0.98;
+            p.life -= dt;
+        });
+        
+        particles = particles.filter(p => p.life > 0);
+
+        // الرسم والتحديثات
+        render();
+        updateHUDIndicators();
+        
+        if (!gameOver) {
+            animationFrameId = requestAnimationFrame(loop);
+        } else {
+            showGameOver();
+        }
+    }
+
+    function resetGame() {
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
+        
+        fitCanvas();
+        cleanup();
+        
+        
+        // **تطبيق الترقيات الدائمة من المتجر**
+        permanentStore.applyToPlayer(player);
+        
+        // إعادة التعيين
+        score = 0; // يتم إعادة تعيين نقاط الجولة فقط
+        scoreEl.textContent = score;
+        player.x = W / 2;
+        player.y = H / 2;
+        player.hp = player.maxHp;
+        resetPlayerUpgrades(); // إعادة تعيين الترقيات المؤقتة فقط
+        running = true;
+        gameOver = false;
+        level = 1;
+        enemiesDefeatedInLevel = 0;
+        boss = null;
+        rapidFireTimer = 0;
+        slowdownTimer = 0;
+        survivalMode = false;
+        survivalTimer = 0;
+        
+        last = performance.now();
+        applyDifficulty();
+        applyUpgrades(); // تطبيق الترقيات (الدائمة والمؤقتة)
+        
+        if (state.music) startMusic();
+        animationFrameId = requestAnimationFrame(loop);
+        
+        healthBar.style.display = 'block';
+        hudIndicators.style.display = 'block';
+        updateHUDIndicators();
+    }
+    
+    function cleanup() {
+        bullets.length = 0;
+        enemies.length = 0;
+        particles.length = 0;
+        powerups.length = 0;
+        particlePool.length = 0;
+        bulletPool.length = 0;
+    }
+
+    function startNextLevel() {
+        level++;
+        enemiesDefeatedInLevel = 0;
+        cleanup();
+        boss = null;
+        rapidFireTimer = 0;
+        slowdownTimer = 0;
+        survivalMode = false;
+        survivalTimer = 0;
+        
+        last = performance.now();
+        applyUpgrades(); // تطبيق الترقيات (الدائمة والمؤقتة)
+        applyDifficulty();
+        
+        if (state.music) {
+            stopMusic();
+            startMusic();
+        }
+        
+        overlay.style.display = 'none';
+        running = true;
+        animationFrameId = requestAnimationFrame(loop);
+    }
+
+        function showGameOver() {
+        pushScore(score); // نضمن حفظ النتيجة الدائمة قبل عرض القائمة
+        
+        // إظهار لوحة التراكب (Overlay) التي تحمل كل القوائم
+        overlay.style.display = 'flex';
+        
+        // إخفاء مؤشرات اللعب وشريط الحياة
+        healthBar.style.display = 'none';
+        hudIndicators.style.display = 'none';
+        
+        // استخدام الدالة showMenu لعرض القائمة الرئيسية المطلوبة
+        showMenu('main-menu');
+        
+        // ضبط حالة اللعبة كـ "في القائمة"
+        inMenu = true;
+    }
+
+
+    // === نظام الرسم المحسّن ===
+    function render() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.save();
+        ctx.translate(-camera.x, -camera.y);
+
+        // الخلفية
+        const hue = (level * 12) % 360;
+        ctx.fillStyle = `hsl(${hue} 40% 6%)`;
+        ctx.fillRect(player.x - W / 2, player.y - H / 2, W, H);
+        
+        // الشبكة
+        ctx.save();
+        ctx.globalAlpha = 0.04;
+        ctx.fillStyle = '#fff';
+        for (let x = -PADDING % 40; x < W + PADDING; x += 40) {
+            ctx.fillRect(x, -PADDING, 1, H + PADDING * 2);
+        }
+        for (let y = -PADDING % 40; y < H + PADDING; y += 40) {
+            ctx.fillRect(-PADDING, y, W + PADDING * 2, 1);
+        }
+        ctx.restore();
+
+        // الحدود
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(-PADDING, -PADDING, W + PADDING * 2, H + PADDING * 2);
+        ctx.restore();
+
+        // اللاعب
+        ctx.save();
+        ctx.beginPath();
+        ctx.fillStyle = player.color;
+        ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
+        ctx.fill();
+        
+        if (player.shieldTimer > 0) {
+            ctx.beginPath();
+            ctx.globalAlpha = 0.4 + Math.sin(elapsed * 10) * 0.1;
+            ctx.strokeStyle = '#00aaff';
+            ctx.lineWidth = 4;
+            ctx.arc(player.x, player.y, player.r + 8, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+        
+        let turretAngle = 0;
+        if (rightJoystick.active && (rightJoystick.dx !== 0 || rightJoystick.dy !== 0)) {
+            turretAngle = Math.atan2(rightJoystick.dy, rightJoystick.dx);
+        } else if (mouse.down) {
+            turretAngle = Math.atan2(mouse.y + camera.y - player.y, mouse.x + camera.x - player.x);
+        } else if (leftJoystick.active && (leftJoystick.dx !== 0 || leftJoystick.dy !== 0)) {
+            turretAngle = Math.atan2(leftJoystick.dy, leftJoystick.dx);
+        }
+        
+        ctx.translate(player.x, player.y);
+        ctx.rotate(turretAngle);
+        ctx.fillStyle = '#081026';
+        ctx.fillRect(8, -8, 18, 16);
+        ctx.restore();
+
+        // الرصاص
+        bullets.forEach(b => {
+            ctx.beginPath();
+            ctx.fillStyle = b.fromEnemy ? b.color : '#fff';
+            ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // الأعداء
+        enemies.forEach(e => {
+            ctx.beginPath();
+            ctx.fillStyle = e.color;
+            ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.font = '12px Tahoma';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.hp, e.x, e.y);
+        });
+
+        // Powerups
+        powerups.forEach(p => {
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, p.life / 5);
+            
+            const emojis = {
+                points: '💰', rapid: '🚀', magnet: '🧲', 
+                shield: '🛡️', health: '❤️', slowdown: '🐌',
+                nova: '💣' 
+            };
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.font = '22px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(emojis[p.type] || '✨', p.x, p.y + 2);
+            ctx.restore();
+        });
+
+        // الجسيمات
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.globalAlpha = Math.max(0, p.life / 1.2);
+            ctx.fillStyle = p.c;
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        
+        ctx.restore();
+        
+        // واجهة التحكم
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fillRect(10, 10, 200, 190); // زيادة حجم الخلفية قليلاً
+        ctx.fillStyle = '#fff';
+        ctx.font = '14px Tahoma'//تم تغيير الحجم من 13 الى 15;
+        ctx.fillStyle = '#ff0000';
+        ctx.font = 'bold 16px Tahoma';
+        ctx.textAlign = 'left';
+        ctx.fillText('LVL: ' + level, 108, 27);
+        
+        // بما أن اللعب أصبح مستمراً
+        ctx.fillStyle = '#7851a9';
+        ctx.font = 'bold 13px Tahoma';
+        ctx.fillText('💀: ' + enemiesDefeatedInLevel + '/' + enemiesPerLevel, 175, 26);
+
+        ctx.fillText('👿: ' + enemies.length, 240, 26);
+        ctx.fillStyle = '#ffd166';
+        ctx.font = 'bold 16px Tahoma';
+        ctx.fillText('♥️: ' + player.hp + '/' + player.maxHp, 280, 27)//تم تغيير الرقم من 18 الى 285 وتغيير من 90 الى 40;
+        ctx.fillStyle = '#00e0ff';
+        ctx.font = 'bold 14px Tahoma';
+        
+        let offsetY = 130;
+        if (player.shieldTimer > 0) { ctx.fillText('🛡️: ' + player.shieldTimer.toFixed(1) + '', 10, 136); }
+        if (player.magnetTimer > 0) { ctx.fillText('🧲: ' + player.magnetTimer.toFixed(1) + '', 10, 54); }
+        if (rapidFireTimer > 0) { ctx.fillText('🚀: ' + rapidFireTimer.toFixed(1) + '', 10, 81); }
+        if (slowdownTimer > 0) { ctx.fillText('🐌: ' + slowdownTimer.toFixed(1) + '', 10, 108); }
+
+        ctx.fillStyle = '#ffd166';
+        ctx.font = 'bold 16px Tahoma';
+        ctx.fillText('💰: ' + score, W - 325, 27)//مكانها في الشاشه;
+    }
+
+    function applyDifficulty() {
+        const difficulty = calculateDifficulty();
+        spawnRate = difficulty.spawnRate;
+    }
+
+    // === بدء اللعبة ===
+    // (تم حذف منطق الـ PWA والـ Service Worker لتركيز على وظيفة اللعبة الأساسية)
+    
+    // التهيئة النهائية
+    showMenu('main-menu');
+    applyDifficulty();
+    updateHSDisplay();
+    
+    console.log('🎮 لعبة حامي المدخل جاهزة! تم تطبيق جميع التحسينات.');
+})();
+
+</script>
+</body>
+</html>
