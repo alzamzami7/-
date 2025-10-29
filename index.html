@@ -6,8 +6,14 @@
   <title>حامي المدخل — نسخة المتجر الدائم</title>
   <style>
     :root{--bg:#061026;--panel:#0f1724;--accent:#ffd166;--danger:#ef476f;--muted:#94a3b8}
-    html,body{height:100%;margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),#021022);color:#fff;overflow:hidden}
-    #game-wrap{max-width:1200px;margin:18px auto;padding:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);display:flex;flex-direction:column;height:calc(100vh - 36px)}
+html,body {
+  height: 100%;
+  margin: 0;
+  font-family: "Tahoma", Arial, sans-serif;
+  background: radial-gradient(circle at center, #0a0f2b 0%, #010511 100%);
+  color: #fff;
+  overflow: hidden;
+}    #game-wrap{max-width:1200px;margin:18px auto;padding:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6);display:flex;flex-direction:column;height:calc(100vh - 36px)}
     header{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;flex-shrink:0}
     h1{font-size:18px;margin:0}
     .controls{font-size:13px;color:var(--muted)}
@@ -55,6 +61,16 @@
         flex-shrink: 0;
         margin-right: 5px; /* مسافة بين زر الشراء والبيع */
     }
+    .btn {
+  background: linear-gradient(180deg, #1e2742, #0d1326);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.btn:hover {
+  background: linear-gradient(180deg, #27355b, #101a33);
+  box-shadow: 0 0 10px var(--accent);
+}
     .buy-btn:disabled {
         background: var(--muted);
         cursor: default;
@@ -172,23 +188,53 @@
         box-shadow: 0 0 15px var(--accent); /* زيادة الظل عند التمرير */
         transform: scale(1.05); /* تكبير خفيف */
     }
+    /* ======= تحسين الشريط العلوي ======= */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.top-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.top-bar .btn, .top-bar .pill {
+  flex-shrink: 0;
+}
+
+.pill {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 14px;
+  box-shadow: 0 0 6px rgba(255,255,255,0.1);
+}
+
+#health-display {
+  background: rgba(255, 0, 0, 0.15);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+}
   </style>
 </head>
 <body>
   <div id="game-wrap">
-    <header>
-      <div class="controls">
-        &nbsp;&nbsp;<button id="settingsBtn" class="btn small">⏸️</button>
-        &nbsp;<button id="restart" class="btn small">🔄</button><h></h>
-        💰: <strong id="permanent-score">0</strong>
-        &nbsp;|&nbsp;
-        🔝: <strong id="score">0</strong>
- </div>
-    </header>
+<header>
+  <div class="controls top-bar">
+    <button id="settingsBtn" class="btn small">⏸️</button>
+    <button id="restart" class="btn small">🔄</button>
+    <div class="pill">💰 <strong id="permanent-score">0</strong></div>
+    <div class="pill" id="health-display">❤️ <strong id="health-count">3</strong></div>
+  </div>
+</header>
 
     <canvas id="game"></canvas>
 
-    <div id="health-bar" style="position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:none;">
+    <div id="health-bar" style="position:absolute; top:10px; left:50%; transform:translateX(-50%); display:none;">
       <div style="background:rgba(255,0,0,0.3); width:200px; height:8px; border-radius:4px;">
         <div id="health-fill" style="background:#00ff00; height:100%; width:100%; border-radius:4px; transition:width 0.3s;"></div>
       </div>
@@ -202,9 +248,9 @@
       <div id="main-menu" style="display:none">
         <h3>♾️لعبة البقاء♾️</h3>
         <div <button id="start-game-btn" class="btn"><h2>ابدأ اللعبة</h2></button></div>
-        <button id="store-menu-btn" class="btn small" style="margin-top:10px">متجر الترقيات الدائمة 💎</button>
-        <button id="scores-menu-btn" class="btn small" style="margin-top:10px">أفضل 10 نتائج</button>
-        <button id="settings-menu-btn" class="btn small">الإعدادات</button>
+        <button id="store-menu-btn" class="btn small" style="margin-top:10px"><h2>🛒</h2></button>
+        <button id="scores-menu-btn" class="btn small" style="margin-top:10px"><h2>أفضل 10 نتائج</h2></button>
+        <button id="settings-menu-btn" class="btn small"><h2>⚙️</h2></button>
       </div>
 
       <div id="settings-menu" style="display:none">
@@ -212,12 +258,13 @@
         <div class="row"><label>مستوى الصعوبة:</label>
           <select id="difficulty"><option value="easy">سهل</option><option value="normal" selected>عادي</option><option value="hard">صعب</option></select>
         </div>
+            <div class="pill">🔝 <strong id="score">0</strong></div>
         <div class="row"><label>الصوت:</label><input type="checkbox" id="soundToggle" checked><span class="muted">(تأثيرات)</span></div>
         <div class="row"><label>موسيقى خلفية:</label><input type="checkbox" id="musicToggle" checked><span class="muted">(مولد صوتي)</span></div>
         <div class="row"><label>حساسية الهدف:</label><input id="sensitivity" type="range" min="0.5" max="2" step="0.1" value="1"></div>&nbsp;&nbsp;
         أفضل نتيجة: <strong id="highscore">0</strong>
         &nbsp;&nbsp;
-        <div       <button id="header-store-btn" class="btn small" style="margin-top:0px">🛒</button></div> <div style="margin-top:10px;text-align:right"><button id="close-settings-btn" class="btn small">حفظ وإغلاق</button></div>
+        <div       <button id="header-store-btn" class="btn small" style="margin-top:0px"><h3>🛒</h3></button></div> <div style="margin-top:10px;text-align:right"><button id="close-settings-btn" class="btn small">حفظ وإغلاق</button></div>
       </div>
 
       <div id="scores-menu" style="display:none">
@@ -270,7 +317,7 @@
     
     // تحسين نظام ضبط الحجم
     const PADDING = 120;//حجم العالم
-    let W, H;
+    let W//للعرض, H//للطول;
     let animationFrameId = null;
     
     function fitCanvas() {
@@ -1024,11 +1071,11 @@ function applyPowerup(type) {
         document.getElementById('current-permanent-score-store').textContent = permanentScore; 
 
         const storeItems = [
-            { key: 'fireRate', title: 'معدل إطلاق دائم 🚀', desc: 'زيادة دائمة لسرعة إطلاق النار. (5 مستويات)' },
-            { key: 'speed', title: 'سرعة حركة دائمة 💨', desc: 'زيادة دائمة لسرعة حركة مركبتك. (5 مستويات)' },
-            { key: 'power', title: 'قوة رصاص دائمة 🔥', desc: 'زيادة دائمة لقوة الرصاص. (5 مستويات)' },
-            { key: 'maxHp', title: 'قلب إضافي دائم ❤️', desc: 'زيادة دائمة للحد الأقصى للحياة. (3 مستويات)' },
-            { key: 'doubleShot', title: 'رصاص إضافي دائم 💥', desc: 'إطلاق رصاصة إضافية دائمة. (3 مستويات)' } // تم تغيير الوصف
+            { key: 'fireRate', title: 'معدل الاطلاق', desc: '' },
+            { key: 'speed', title: 'سرعة الحركة', desc: '' },
+            { key: 'power', title: 'قوة الرصاص', desc: '' },
+            { key: 'maxHp', title: 'قلب إضافي ❤️', desc: '' },
+            { key: 'doubleShot', title: 'رصاص إضافي', desc: '' } // تم تغيير الوصف
         ];
 
         storeItems.forEach(item => {
@@ -1063,7 +1110,7 @@ function applyPowerup(type) {
                 buyBtn.textContent = 'أقصى مستوى ✅';
                 buyBtn.disabled = true;
             } else {
-                buyBtn.textContent = `شراء: ${cost} نقطة`;
+                buyBtn.textContent = `شراء${cost}`;
                 buyBtn.disabled = !canBuy;
                 buyBtn.addEventListener('click', () => {
                     if (permanentStore.buyUpgrade(item.key)) {
@@ -1078,7 +1125,7 @@ function applyPowerup(type) {
             // زر البيع
             const sellBtn = document.createElement('button');
             sellBtn.className = 'sell-btn';
-            sellBtn.textContent = `بيع: ${sellPrice} نقطة`;
+            sellBtn.textContent = `بيع${sellPrice}`;
             sellBtn.disabled = !canSell;
             sellBtn.addEventListener('click', () => {
                 if (permanentStore.sellUpgrade(item.key)) {
@@ -1333,48 +1380,63 @@ function applyPowerup(type) {
 
     // === وظائف اللعبة الأساسية المحسنة ===
     function shoot(fromX, fromY, tx, ty) {
-        const ang = Math.atan2(ty - fromY, tx - fromX);
-        const bulletSpeed = 520 * state.sensitivity;
-        const newBullet = { 
-            x: fromX, y: fromY, 
-            vx: Math.cos(ang) * bulletSpeed, 
-            vy: Math.sin(ang) * bulletSpeed, 
-            r: 4,//حجم الرصاص
- life: 1.6, 
-            power: player.bulletPower,
-            fromEnemy: false
-        };
+    // الزاوية الأصلية للرصاصة الأساسية
+    const ang = Math.atan2(ty - fromY, tx - fromX); 
+    const bulletSpeed = 520 * state.sensitivity;
+    
+    const newBullet = { 
+        x: fromX, y: fromY, // الموقع هو دائمًا مركز اللاعب
+        vx: Math.cos(ang) * bulletSpeed, 
+        vy: Math.sin(ang) * bulletSpeed, 
+        r: 4,//حجم الرصاص
+        life: 1.6, 
+        power: player.bulletPower,
+        fromEnemy: false
+    };
+    
+    // عدد الرصاصات الإضافية هو مستوى الترقية الدائمة
+    const extraBullets = player.doubleShotPermanentLevel; 
+    
+    if (extraBullets > 0) {
+        // قيمة زاوية الانفراج لكل طلقة إضافية
+        const ANGLE_SPREAD = 0.1; // يمكنك تغيير هذا الرقم (0.15 راديان)
         
-        // **منطق الإطلاق المزدوج/المتعدد الجديد**
-        // عدد الرصاصات الإضافية هو مستوى الترقية الدائمة
-        const extraBullets = player.doubleShotPermanentLevel; 
+        // إطلاق الرصاصة الأساسية (تخرج دائمًا بشكل مستقيم)
+        bullets.push(newBullet);
         
-        if (extraBullets > 0) {
-            const offsetStep = 10;
-            const perpAngle = ang + Math.PI / 2;
+        // إطلاق الرصاصات الإضافية
+        for (let i = 1; i <= extraBullets; i++) {
+            // 1. حساب الزاوية الجديدة للطلقات التي تنطلق لليمين (بشكل أوسع)
+            const rightAngle = ang + ANGLE_SPREAD * i; 
             
-            // إطلاق الرصاصة الأساسية
-            bullets.push(newBullet);
+            // 2. إطلاق رصاصة اليمين من المركز (fromX, fromY) بالزاوية الجديدة
+            bullets.push({ 
+                ...newBullet, 
+                vx: Math.cos(rightAngle) * bulletSpeed, 
+                vy: Math.sin(rightAngle) * bulletSpeed 
+            });
             
-            // إطلاق الرصاصات الإضافية (واحدة على كل جانب)
-            for (let i = 1; i <= extraBullets; i++) {
-                const offset = offsetStep * i;
-                bullets.push({ ...newBullet, x: fromX + Math.cos(perpAngle) * offset, y: fromY + Math.sin(perpAngle) * offset });
-                bullets.push({ ...newBullet, x: fromX - Math.cos(perpAngle) * offset, y: fromY - Math.sin(perpAngle) * offset });
-            }
-            // ملاحظة: مع مستوى ترقية 3، سيكون العدد الإجمالي للرصاصات هو: 1 (الأساسية) + 3 (يميناً) + 3 (يساراً) = 7 رصاصات! وهذا ممتاز لترقية ذات 3 مستويات.
+            // 3. حساب الزاوية الجديدة للطلقات التي تنطلق لليسار (بشكل أوسع)
+            const leftAngle = ang - ANGLE_SPREAD * i;
             
-        } else if (player.upgrades.doubleShot) { // في حال وجود ترقية مؤقتة للإطلاق المزدوج (إذا أعدناها)
-             const offset = 10;
-             const perpAngle = ang + Math.PI / 2;
-             bullets.push({ ...newBullet, x: fromX + Math.cos(perpAngle) * offset, y: fromY + Math.sin(perpAngle) * offset });
-             bullets.push({ ...newBullet, x: fromX - Math.cos(perpAngle) * offset, y: fromY - Math.sin(perpAngle) * offset });
-        } else {
-            bullets.push(newBullet);
+            // 4. إطلاق رصاصة اليسار من المركز (fromX, fromY) بالزاوية الجديدة
+            bullets.push({ 
+                ...newBullet, 
+                vx: Math.cos(leftAngle) * bulletSpeed, 
+                vy: Math.sin(leftAngle) * bulletSpeed 
+            });
         }
         
-        safePlayBeep(900 + rand(0, 60), 0.03, 'square', 0.06);
+    } else if (player.upgrades.doubleShot) { 
+        // ... (كود الترقية المؤقتة يبقى كما هو أو يتم تعديله بنفس الطريقة) ...
+        bullets.push(newBullet); // نطلق رصاصة واحدة فقط إذا كانت ترقية مؤقتة
+    } else {
+        bullets.push(newBullet);
     }
+    
+    safePlayBeep(900 + rand(0, 60), 0.03, 'square', 0.06);
+}
+
 
     function spawnEnemy() {
         const edge = Math.floor(rand(0, 4));
@@ -1485,6 +1547,9 @@ function applyPowerup(type) {
             healthFill.style.width = percent + '%';
             healthFill.style.background = percent > 50 ? '#00ff00' : percent > 25 ? '#ffff00' : '#ff0000';
         }
+        // تحديث عنصر النص الذي يعرض عدد القلوب في الواجهة (إن وُجد)
+const healthCountEl = document.getElementById('health-count');
+if (healthCountEl) healthCountEl.textContent = player.hp;
     }
 
     // === الحلقة الرئيسية المحسنة ===
@@ -1546,21 +1611,35 @@ function applyPowerup(type) {
             showUpgradeMenu(); // ترقية نهاية المستوى المؤقتة
             return;
         }
-            
-        // إطلاق النار
-        player.reloadTimer -= dt;
-        const currentReload = rapidFireTimer > 0 ? player.reload / 2 : player.reload;
-        
-        if (rightJoystick.active && player.reloadTimer <= 0 && (rightJoystick.dx !== 0 || rightJoystick.dy !== 0)) {
-            const ang = Math.atan2(rightJoystick.dy, rightJoystick.dx);
-            const tx = player.x + Math.cos(ang) * 100;
-            const ty = player.y + Math.sin(ang) * 100;
-            shoot(player.x, player.y, tx, ty);
-            player.reloadTimer = currentReload;
-        } else if (mouse.down && player.reloadTimer <= 0) {
-            shoot(player.x, player.y, mouse.x + camera.x, mouse.y + camera.y);
-            player.reloadTimer = currentReload;
-        }
+// إطلاق النار
+player.reloadTimer -= dt;
+const currentReload = rapidFireTimer > 0 ? player.reload / 2 : player.reload;
+
+// لو استخدم اللاعب دائرة التصويب اليمنى، فنعطيها الأولوية
+if (rightJoystick.active && (rightJoystick.dx !== 0 || rightJoystick.dy !== 0)) {
+    if (player.reloadTimer <= 0) {
+        const ang = Math.atan2(rightJoystick.dy, rightJoystick.dx);
+        const tx = player.x + Math.cos(ang) * 100;
+        const ty = player.y + Math.sin(ang) * 100;
+        shoot(player.x, player.y, tx, ty);
+        player.reloadTimer = currentReload;
+    }
+}
+// لو لم يستخدم دائرة التصويب، اتبع اتجاه الحركة
+else if (leftJoystick.active && (leftJoystick.dx !== 0 || leftJoystick.dy !== 0)) {
+    if (player.reloadTimer <= 0) {
+        const ang = Math.atan2(leftJoystick.dy, leftJoystick.dx);
+        const tx = player.x + Math.cos(ang) * 100;
+        const ty = player.y + Math.sin(ang) * 100;
+        shoot(player.x, player.y, tx, ty);
+        player.reloadTimer = currentReload;
+    }
+}
+// دعم الماوس فقط لو كان في الحاسوب
+else if (mouse.down && player.reloadTimer <= 0) {
+    shoot(player.x, player.y, mouse.x + camera.x, mouse.y + camera.y);
+    player.reloadTimer = currentReload;
+}
 
         // تحديث الرصاص
         bullets = bullets.filter(b => {
@@ -1752,11 +1831,15 @@ function applyPowerup(type) {
         ctx.restore();
 
         // اللاعب
-        ctx.save();
-        ctx.beginPath();
-        ctx.fillStyle = player.color;
-        ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
-        ctx.fill();
+// اللاعب مع توهج خفيف
+ctx.save();
+ctx.shadowBlur = 20;
+ctx.shadowColor = player.color;
+ctx.beginPath();
+ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
+ctx.fillStyle = player.color;
+ctx.fill();
+ctx.closePath();
         
         if (player.shieldTimer > 0) {
             ctx.beginPath();
@@ -1780,7 +1863,7 @@ function applyPowerup(type) {
         ctx.translate(player.x, player.y);
         ctx.rotate(turretAngle);
         ctx.fillStyle = '#081026';
-        ctx.fillRect(8, -8, 18, 16);
+        ctx.fillRect(8, -8, 10, 16);
         ctx.restore();
 
         // الرصاص
@@ -1833,40 +1916,131 @@ function applyPowerup(type) {
         });
         
         ctx.restore();
-        
-        // واجهة التحكم
-        ctx.fillStyle = 'rgba(0,0,0,0.15)';
-        ctx.fillRect(10, 10, 200, 190); // زيادة حجم الخلفية قليلاً
-        ctx.fillStyle = '#fff';
-        ctx.font = '14px Tahoma'//تم تغيير الحجم من 13 الى 15;
-        ctx.fillStyle = '#ff0000';
-        ctx.font = 'bold 16px Tahoma';
-        ctx.textAlign = 'left';
-        ctx.fillText('LVL: ' + level, 108, 27);
-        
-        // بما أن اللعب أصبح مستمراً
-        ctx.fillStyle = '#7851a9';
-        ctx.font = 'bold 13px Tahoma';
-        ctx.fillText('💀: ' + enemiesDefeatedInLevel + '/' + enemiesPerLevel, 175, 26);
+// ===== واجهة التحكم مرتبة بخلفيات زجاجية مستقلة =====
 
-        ctx.fillText('👿: ' + enemies.length, 240, 26);
-        ctx.fillStyle = '#ffd166';
-        ctx.font = 'bold 16px Tahoma';
-        ctx.fillText('♥️: ' + player.hp + '/' + player.maxHp, 280, 27)//تم تغيير الرقم من 18 الى 285 وتغيير من 90 الى 40;
-        ctx.fillStyle = '#00e0ff';
-        ctx.font = 'bold 14px Tahoma';
-        
-        let offsetY = 130;
-        if (player.shieldTimer > 0) { ctx.fillText('🛡️: ' + player.shieldTimer.toFixed(1) + '', 10, 136); }
-        if (player.magnetTimer > 0) { ctx.fillText('🧲: ' + player.magnetTimer.toFixed(1) + '', 10, 54); }
-        if (rapidFireTimer > 0) { ctx.fillText('🚀: ' + rapidFireTimer.toFixed(1) + '', 10, 81); }
-        if (slowdownTimer > 0) { ctx.fillText('🐌: ' + slowdownTimer.toFixed(1) + '', 10, 108); }
+// إعدادات عامة
+ctx.textBaseline = 'top';
+ctx.textAlign = 'left';
+ctx.font = 'bold 16px Tahoma';
 
-        ctx.fillStyle = '#ffd166';
-        ctx.font = 'bold 16px Tahoma';
-        ctx.fillText('💰: ' + score, W - 325, 27)//مكانها في الشاشه;
+// ===== 💰 عرض النقود (أعلى يمين) =====
+{
+    const text = `💰:${score}`;
+    ctx.font = 'bold 16px Tahoma';
+    const paddingX = 10;
+    const paddingY = 5;
+    const textWidth = ctx.measureText(text).width;
+    const boxWidth = textWidth + paddingX * 2;
+    const boxHeight = 26;
+    const boxX = W - boxWidth - 1;
+    const boxY = 5;
+
+    // خلفية زجاجية قابلة للتمدد
+    ctx.save();
+    ctx.fillStyle = 'rgba(20, 15, 40, 0.55)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 8);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // النص داخلها
+    ctx.fillStyle = '#00ff55';
+    ctx.textAlign = 'left';
+    ctx.fillText(text, boxX + paddingX, boxY + 6);
+}
+
+// ===== 💀 الأعداء (تحت النقود مباشرة) =====
+{
+    const text = `💀:${enemiesDefeatedInLevel}/${enemiesPerLevel}`;
+    ctx.font = 'bold 14px Tahoma';
+    const paddingX = 10;
+    const paddingY = 5;
+    const textWidth = ctx.measureText(text).width;
+    const boxWidth = textWidth + paddingX * 2;
+    const boxHeight = 22;
+    const boxX = W - boxWidth - 1;
+    const boxY = 37;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(20, 25, 40, 0.55)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 8);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = '#00e0ff';
+    ctx.textAlign = 'left';
+    ctx.fillText(text, boxX + paddingX, boxY + 5);
+}
+
+// ===== 🔹 المستوى (منتصف الشاشة في الأعلى) =====
+{
+    const text = `${level}`;
+    ctx.font = 'bold 16px Tahoma';
+    const textWidth = ctx.measureText(text).width;
+    const boxWidth = textWidth + 20;
+    const boxHeight = 28;
+    const boxX = (W / 2) - (boxWidth / 2);
+    const boxY = 5;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(20, 25, 40, 0.55)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 10);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = '#ffae00';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, W / 2, boxY + 7);
+}
+
+// ===== ⚡ المؤقتات والقدرات (بالجهة اليسرى) =====
+{
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 14px Tahoma';
+    const baseX = 15;
+    let baseY = 10;
+
+    function drawBuff(icon, value, color) {
+        const text = `${icon} ${value.toFixed(1)}s`;
+        const textWidth = ctx.measureText(text).width;
+        const boxWidth = textWidth + 16;
+        const boxHeight = 25;
+        const paddingX = 8;
+        const boxY = baseY;
+        const boxX = baseX;
+
+        // خلفية زجاجية صغيرة
+        ctx.save();
+        ctx.fillStyle = 'rgba(20, 25, 40, 0.45)';
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 6);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.fillStyle = color;
+        ctx.fillText(text, boxX + paddingX, boxY + 5);
+        baseY += boxHeight + 6;
     }
 
+    if (player.shieldTimer > 0) drawBuff('🛡', player.shieldTimer, '#00e0ff');
+    if (player.magnetTimer > 0) drawBuff('🧲', player.magnetTimer, '#ffffff');
+    if (rapidFireTimer > 0) drawBuff('🚀', rapidFireTimer, '#ffd166');
+    if (slowdownTimer > 0) drawBuff('🐌', slowdownTimer, '#ff66ff');
+}}
     function applyDifficulty() {
         const difficulty = calculateDifficulty();
         spawnRate = difficulty.spawnRate;
